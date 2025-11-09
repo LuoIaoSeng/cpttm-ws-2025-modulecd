@@ -6,7 +6,7 @@
     <div class="app">
         <div class="container">
             <h1>Home Page</h1>
-            <RouterLink class="link-button">Map Editor</RouterLink>
+            <RouterLink class="link-button" to="editor">Map Editor</RouterLink>
             <RouterLink class="link-button" to="instructions">Instructions</RouterLink>
             <RouterLink class="link-button">Load Map File</RouterLink>
         </div>
