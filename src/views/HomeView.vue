@@ -6,9 +6,9 @@
     <div class="app">
         <div class="container">
             <h1>Home Page</h1>
-            <RouterLink class="item">Map Editor</RouterLink>
-            <RouterLink class="item">Instructions</RouterLink>
-            <RouterLink class="item">Load Map File</RouterLink>
+            <RouterLink class="link-button">Map Editor</RouterLink>
+            <RouterLink class="link-button" to="instructions">Instructions</RouterLink>
+            <RouterLink class="link-button">Load Map File</RouterLink>
         </div>
     </div>
 </template>
@@ -27,7 +27,7 @@
     gap: 1rem;
 }
 
-.item {
+.link-button {
     border: 2px solid #333;
     padding: 1rem 4rem 1rem 2rem;
     box-sizing: border-box;
