@@ -10,6 +10,19 @@ const canvasRef = useTemplateRef('canvas')
 
 let ctx = null
 
+function drawBlock(i, j, type) {
+    if (ctx === null) {
+        alert('ctx is null')
+    }
+    switch (type) {
+        case 0:
+            break
+        case 1:
+            ctx.fillStyle = '#f7941d'
+            ctx.fillRect(j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+    }
+}
+
 function initMap() {
     ctx = canvasRef.value.getContext('2d')
 
@@ -21,7 +34,7 @@ function initMap() {
 
     for (let i = 0; i < props.map.length; i++) {
         for (let j = 0; j < props.map[i].length; j++) {
-            
+            drawBlock(i, j, props.map[i][j])
         }
     }
 }
