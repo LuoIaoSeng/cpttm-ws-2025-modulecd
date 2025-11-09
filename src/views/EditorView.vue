@@ -46,6 +46,9 @@ function handleMouseDown(e) {
         <button class="tool-button" @click="tool = 3">
             <img src="/src/assets/Star.svg" alt="">
         </button>
+        <button class="tool-button" @click="tool = 1">
+            <img src="/src/assets/Block.svg" alt="">
+        </button>
         <button class="tool-button" @click="tool = 4">
             <img src="/src/assets/Spring.svg" alt="">
         </button>
