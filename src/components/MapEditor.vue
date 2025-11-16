@@ -7,7 +7,6 @@ const props = defineProps([
     'tool'
 ])
 
-
 const canvasRef = useTemplateRef('canvas')
 const blockImageRef = useTemplateRef('blockImage')
 const spawnImageRef = useTemplateRef('spawnImage')

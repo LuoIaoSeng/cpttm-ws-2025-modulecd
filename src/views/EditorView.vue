@@ -1,6 +1,7 @@
 <script setup>
 import { NumX, NumY } from '@/assets/config';
 import MapEditor from '@/components/MapEditor.vue';
+import MapRunner from '@/components/MapRunner.vue';
 import router from '@/router';
 import { onMounted, ref } from 'vue';
 
@@ -59,6 +60,8 @@ function exportMaps() {
     a.click()
 }
 
+const isPlayDemo = ref(false)
+
 </script>
 
 <template>
@@ -71,7 +74,8 @@ function exportMaps() {
                 <button @click="mapIndex = 2">Level 3</button>
             </div>
             <div>
-                <button>Play&nbsp;Demo</button>
+                <button v-if="!isPlayDemo" @click="isPlayDemo = true">Play&nbsp;Demo</button>
+                <button v-else @click="isPlayDemo = false">Back&nbsp;Editor</button>
                 <button @click="exportMaps">Export</button>
                 <button @click="toHome">
                     Home
@@ -79,7 +83,7 @@ function exportMaps() {
             </div>
         </div>
         <div class="editor-panel">
-            <div class="tool">
+            <div v-if="!isPlayDemo" class="tool">
                 <button class="tool-button" @click="tool = 2">
                     <img src="/src/assets/Spawn.svg" alt="">
                 </button>
@@ -97,11 +101,10 @@ function exportMaps() {
                 </button>
             </div>
 
-            <MapEditor :map="maps[mapIndex].data" :tool="tool"></MapEditor>
+            <MapRunner v-if="isPlayDemo" :demo="true" :map="maps[mapIndex].data"></MapRunner>
+            <MapEditor v-else :map="maps[mapIndex].data" :tool="tool"></MapEditor>
         </div>
     </div>
-
-
 
 </template>
 
