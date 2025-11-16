@@ -1,20 +1,29 @@
 <script setup>
 import { NumX, NumY } from '@/assets/config';
 import MapEditor from '@/components/MapEditor.vue';
+import router from '@/router';
 import { onMounted, ref } from 'vue';
 
 const maps = ref([
     {
-        level: 'level1',
+        level: 'level 1',
         data: []
-    }
+    },
+    {
+        level: 'level 2',
+        data: []
+    },
+    {
+        level: 'level 3',
+        data: []
+    },
 ])
 
 maps.value.forEach((obj) => {
-    for(let i = 0;i < NumY;i ++) {
+    for (let i = 0; i < NumY; i++) {
         obj.data.push(new Array(NumX).fill(0))
     }
-    for(let i = 0;i < NumX;i ++) {
+    for (let i = 0; i < NumX; i++) {
         obj.data[NumY - 1][i] = 1
     }
 })
@@ -32,40 +41,92 @@ onMounted(() => {
 
 function handleMouseDown(e) {
     // console.log(e)
-    if(e.button === 2) {
+    if (e.button === 2) {
         tool.value = -1
     }
+}
+
+function toHome() {
+    router.push('/')
 }
 
 </script>
 
 <template>
 
-    <div class="tool">
-        <button class="tool-button" @click="tool = 2">
-            <img src="/src/assets/Spawn.svg" alt="">
-        </button>
-        <button class="tool-button" @click="tool = 3">
-            <img src="/src/assets/Star.svg" alt="">
-        </button>
-        <button class="tool-button" @click="tool = 1">
-            <img src="/src/assets/Block.svg" alt="">
-        </button>
-        <button class="tool-button" @click="tool = 4">
-            <img src="/src/assets/Spring.svg" alt="">
-        </button>
-        <button class="tool-button" @click="tool = 0">
-            <img src="/src/assets/Erase.svg" alt="">
-        </button>
+    <div class="container">
+        <div class="menu-list">
+            <div>
+                <button @click="mapIndex = 0">Level 1</button>
+                <button @click="mapIndex = 1">Level 2</button>
+                <button @click="mapIndex = 2">Level 3</button>
+            </div>
+            <div>
+                <button>Play&nbsp;Demo</button>
+                <button>Export</button>
+                <button @click="toHome">
+                    Home
+                </button>
+            </div>
+        </div>
+        <div class="editor-panel">
+            <div class="tool">
+                <button class="tool-button" @click="tool = 2">
+                    <img src="/src/assets/Spawn.svg" alt="">
+                </button>
+                <button class="tool-button" @click="tool = 3">
+                    <img src="/src/assets/Star.svg" alt="">
+                </button>
+                <button class="tool-button" @click="tool = 1">
+                    <img src="/src/assets/Block.svg" alt="">
+                </button>
+                <button class="tool-button" @click="tool = 4">
+                    <img src="/src/assets/Spring.svg" alt="">
+                </button>
+                <button class="tool-button" @click="tool = 0">
+                    <img src="/src/assets/Erase.svg" alt="">
+                </button>
+            </div>
+
+            <MapEditor :map="maps[mapIndex].data" :tool="tool"></MapEditor>
+        </div>
     </div>
 
-    <MapEditor :map="maps[mapIndex].data" :tool="tool"></MapEditor>
 
-    {{ tool }}
 
 </template>
 
 <style scoped>
+.container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+.menu-list {
+    padding: 1rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex-grow: 0;
+}
+
+.menu-list>div {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu-list button {
+    padding: 1rem;
+    font-size: 1.2rem;
+}
+
+.editor-panel {
+    padding: 1rem;
+}
+
 .tool {
     display: flex;
 }
@@ -85,7 +146,7 @@ function handleMouseDown(e) {
     background: #ddd;
 }
 
-.tool-button > img {
+.tool-button>img {
     width: 100%;
     height: 100%;
 }

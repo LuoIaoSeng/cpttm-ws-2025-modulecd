@@ -157,6 +157,10 @@ watch(() => props.tool, async (n, o) => {
     }
 })
 
+watch(() => props.map, async(n, o) => {
+    drawMap()
+})
+
 onMounted(() => {
     ctx = canvasRef.value.getContext('2d')
     initMap()
@@ -173,7 +177,6 @@ onMounted(() => {
     <img ref="spawnImage" src="/src/assets/Spawn.svg" alt="">
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
-    {{ props.map }}
 </template>
 
 <style scoped>
