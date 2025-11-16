@@ -22,27 +22,39 @@ let dragStartX, dragStartY
 
 let isDragging = false
 
-function drawBlock(i, j, type) {
+function drawBlock(x, y, type) {
     if (ctx === null) {
         alert('ctx is null')
     }
     switch (type) {
         case 0:
             ctx.fillStyle = '#cef1ff'
-            ctx.fillRect(j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+            ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
         case 1:
-            ctx.drawImage(blockImageRef.value, j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+            ctx.drawImage(blockImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
         case 2:
-            ctx.drawImage(spawnImageRef.value, j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+            ctx.drawImage(spawnImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
         case 3:
-            ctx.drawImage(starImageRef.value, j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+            ctx.drawImage(starImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
         case 4:
-            ctx.drawImage(springImageRef.value, j * BlockSize, i * BlockSize, BlockSize, BlockSize)
+            ctx.drawImage(springImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
+    }
+}
+
+function canPlace(x, y, type) {
+    if (type != 0 && props.map[y][x] != 0) {
+        return false
+    }
+    switch (type) {
+        case 0:
+        case 1:
+        case 4:
+            return true
     }
 }
 
@@ -53,7 +65,7 @@ function drawMap() {
 
     for (let i = 0; i < props.map.length; i++) {
         for (let j = 0; j < props.map[i].length; j++) {
-            drawBlock(i, j, props.map[i][j])
+            drawBlock(j, i, props.map[i][j])
         }
     }
 }
@@ -74,13 +86,32 @@ function handleMousemove(e) {
 
         x = parseInt(sx / BlockSize)
         y = parseInt(sy / BlockSize)
+
         if (prevX != x || prevY != y) {
-            drawBlock(prevY, prevX, prevV)
+
+            drawBlock(prevX, prevY, prevV)
         }
+
+        if (isDragging && props.tool == 1) {
+            drawMap()
+            const dir = Math.abs(x - dragStartX) > Math.abs(y - dragStartY) ? 'x' : 'y'
+            if (dir == 'x') {
+                for (let i = Math.min(x, dragStartX); i <= Math.max(x, dragStartX); i++) {
+                    drawBlock(i, dragStartY, 1)
+                }
+            } else {
+                for (let i = Math.min(y, dragStartY); i <= Math.max(y, dragStartY); i++) {
+                    drawBlock(dragStartX, i, 1)
+                }
+            }
+        }
+
+
         prevX = x
         prevY = y
         prevV = props.map[y][x]
-        drawBlock(y, x, props.tool)
+
+        drawBlock(x, y, props.tool)
     }
 }
 
@@ -95,8 +126,29 @@ function handleMousedown(e) {
 function handleMouseup(e) {
     if (dragStartX == x && dragStartY == y && props.tool != -1 && isDragging) {
         isDragging = false
-        props.map[y][x] = props.tool
+        if (canPlace(x, y, props.tool)) {
+            props.map[y][x] = props.tool
+        }
+    } else if ((dragStartX != x || dragStartY != y) && props.tool == 1 && isDragging) {
+
+        const dir = Math.abs(x - dragStartX) > Math.abs(y - dragStartY) ? 'x' : 'y'
+        if (dir == 'x') {
+            for (let i = Math.min(x, dragStartX); i <= Math.max(x, dragStartX); i++) {
+                if (canPlace(i, dragStartY, 1)) {
+                    props.map[dragStartY][i] = props.tool
+                }
+            }
+        } else {
+            for (let i = Math.min(y, dragStartY); i <= Math.max(y, dragStartY); i++) {
+                if (canPlace(dragStartX, i, 1)) {
+                    props.map[i][dragStartX] = props.tool
+                }
+            }
+        }
+
+        isDragging = false
     }
+    drawMap()
 }
 
 watch(() => props.tool, async (n, o) => {
