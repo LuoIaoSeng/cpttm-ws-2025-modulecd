@@ -6,15 +6,17 @@ import { onMounted, ref } from 'vue';
 const maps = ref([
     {
         level: 'level1',
-        data: [
-            ...new Array(NumY).fill(new Array(NumX).fill(0))
-        ]
+        data: []
     }
 ])
 
 maps.value.forEach((obj) => {
-    // console.log(obj.data)
-    obj.data[NumY - 1] = [...Array(NumX).fill(1)]
+    for(let i = 0;i < NumY;i ++) {
+        obj.data.push(new Array(NumX).fill(0))
+    }
+    for(let i = 0;i < NumX;i ++) {
+        obj.data[NumY - 1][i] = 1
+    }
 })
 
 const mapIndex = ref(0)
