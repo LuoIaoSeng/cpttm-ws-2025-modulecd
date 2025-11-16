@@ -50,6 +50,15 @@ function toHome() {
     router.push('/')
 }
 
+function exportMaps() {
+    const data = JSON.stringify(maps.value)
+    const blob = new Blob([data])
+    const a = document.createElement('a')
+    a.href = URL.createObjectURL(blob)
+    a.download = 'maps'
+    a.click()
+}
+
 </script>
 
 <template>
@@ -63,7 +72,7 @@ function toHome() {
             </div>
             <div>
                 <button>Play&nbsp;Demo</button>
-                <button>Export</button>
+                <button @click="exportMaps">Export</button>
                 <button @click="toHome">
                     Home
                 </button>
