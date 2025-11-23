@@ -5,8 +5,7 @@ import { BlockSize, NumY, NumX } from '@/assets/config';
 
 const props = defineProps([
     'map',
-    'demo',
-    'loopId'
+    'demo'
 ])
 
 const canvasRef = useTemplateRef('canvas')
@@ -19,6 +18,13 @@ let ctx = null
 let loopId = null
 let keySet = new Set()
 
+let game = {
+    stars: 0,
+    time: 0,
+    hp: 3,
+    pause: false,
+    finished: false
+}
 let objects = []
 let player = {
     x: -1,
@@ -68,6 +74,9 @@ function initMap() {
                 player.x = j
                 player.y = i
             } else {
+                if (props.map[i][j] == 3) {
+                    game.stars++
+                }
                 objects.push({
                     x: j,
                     y: i,
@@ -140,13 +149,25 @@ function handleCollision() {
         }
     }
 
-    if(xobj != null) {
-        if(xobj.type == 3) {
+    if (xobj != null) {
+        if (xobj.type == 3) {
             drawBlock(xobj.x, xobj.y, 0)
             objects = objects.filter((obj) => {
                 return !(obj.x == xobj.x && obj.y == xobj.y)
             })
+            game.stars--
         }
+    } else if (yobj != null) {
+        if (yobj.type == 3) {
+            drawBlock(yobj.x, yobj.y, 0)
+            objects = objects.filter((obj) => {
+                return !(obj.x == yobj.x && obj.y == yobj.y)
+            })
+            game.stars--
+        }
+    }
+    if (game.stars == 0) {
+        game.pause = true
     }
 }
 
@@ -167,18 +188,20 @@ function input() {
 }
 
 function loop() {
-    player.px = player.x
-    player.py = player.y
-    drawBlock(player.px, player.py, 0)
-    let b = checkCollision(player.x, player.y + 0.2)
-    if (b != null) {
-        if (b.type == 1) {
-            player.grounded = true
+    if (!game.pause) {
+        player.px = player.x
+        player.py = player.y
+        drawBlock(player.px, player.py, 0)
+        let b = checkCollision(player.x, player.y + 0.2)
+        if (b != null) {
+            if (b.type == 1) {
+                player.grounded = true
+            }
         }
+        input()
+        handleCollision()
+        drawBlock(player.x, player.y, 2)
     }
-    input()
-    handleCollision()
-    drawBlock(player.x, player.y, 2)
     loopId = requestAnimationFrame(loop)
 }
 
