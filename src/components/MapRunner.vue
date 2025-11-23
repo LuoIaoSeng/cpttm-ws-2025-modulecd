@@ -1,6 +1,6 @@
 <script setup>
 
-import { onMounted, onUnmounted, useTemplateRef } from 'vue';
+import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { BlockSize, NumY, NumX } from '@/assets/config';
 
 const props = defineProps([
@@ -18,13 +18,14 @@ let ctx = null
 let loopId = null
 let keySet = new Set()
 
-let game = {
+const game = ref({
     stars: 0,
     time: 0,
     hp: 3,
     pause: false,
     finished: false
-}
+})
+
 let objects = []
 let player = {
     x: -1,
@@ -75,7 +76,7 @@ function initMap() {
                 player.y = i
             } else {
                 if (props.map[i][j] == 3) {
-                    game.stars++
+                    game.value.stars++
                 }
                 objects.push({
                     x: j,
@@ -155,7 +156,7 @@ function handleCollision() {
             objects = objects.filter((obj) => {
                 return !(obj.x == xobj.x && obj.y == xobj.y)
             })
-            game.stars--
+            game.value.stars--
         }
     } else if (yobj != null) {
         if (yobj.type == 3) {
@@ -163,11 +164,12 @@ function handleCollision() {
             objects = objects.filter((obj) => {
                 return !(obj.x == yobj.x && obj.y == yobj.y)
             })
-            game.stars--
+            game.value.stars--
         }
     }
-    if (game.stars == 0) {
-        game.pause = true
+    if (game.value.stars == 0) {
+        game.value.pause = true
+        game.value.finished = true
     }
 }
 
@@ -188,11 +190,11 @@ function input() {
 }
 
 function loop() {
-    if (!game.pause) {
+    if (!game.value.pause) {
         player.px = player.x
         player.py = player.y
         drawBlock(player.px, player.py, 0)
-        let b = checkCollision(player.x, player.y + 0.2)
+        let b = checkCollision(player.x, player.y + 0.5)
         if (b != null) {
             if (b.type == 1) {
                 player.grounded = true
@@ -217,6 +219,9 @@ onUnmounted(() => {
     <img ref="playerImage" src="/src/assets/Player.svg" alt="">
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
+    <div v-if="game.finished">
+        
+    </div>
 </template>
 
 <style scoped>
