@@ -25,6 +25,7 @@ let player = {
     y: -1,
     px: 0,
     py: 0,
+    sx: 0,
     sy: 0,
     grounded: true
 }
@@ -106,53 +107,77 @@ function isInteract(x1, y1, x2, y2) {
 }
 
 function checkCollision(x, y) {
-    let b = -1
+    let o = null
     objects.forEach((obj) => {
         if (obj.type != 0) {
             const flag = isInteract(x, y, obj.x, obj.y)
-            if (flag && b == -1) {
-                b = obj.type
+            if (flag && o == null) {
+                o = obj
             }
         }
     })
-    return b
+    return o
 }
 
-function handleCollision(collision) {
-    switch (collision) {
-        case 1:
+function handleCollision() {
+
+    let xobj = checkCollision(player.x, player.py)
+
+    if (xobj != null) {
+        if (xobj.type == 1) {
             player.x = player.px
+        }
+    }
+
+    player.sy += 9.8 / 60
+    player.y += player.sy / 60
+
+    let yobj = checkCollision(player.px, player.y)
+
+    if (yobj != null) {
+        if (yobj.type != -1) {
             player.y = player.py
-            break
+        }
+    }
+
+    if(xobj != null) {
+        if(xobj.type == 3) {
+            drawBlock(xobj.x, xobj.y, 0)
+            objects = objects.filter((obj) => {
+                return !(obj.x == xobj.x && obj.y == xobj.y)
+            })
+        }
     }
 }
 
 function input() {
-    const speed = 0.1
+    const speed = 10
+    player.sx = 0
     if (keySet.has('a')) {
-        player.x -= speed
+        player.sx = -1
     }
     if (keySet.has('w') && player.grounded) {
         player.sy = -10
         player.grounded = false
     }
     if (keySet.has('d')) {
-        player.x += speed
+        player.sx = 1
     }
-    player.sy += 9.8 / 60
-    player.y += player.sy / 60
+    player.x += player.sx * speed / 60
 }
 
 function loop() {
     player.px = player.x
     player.py = player.y
     drawBlock(player.px, player.py, 0)
-    if (checkCollision(player.x, player.y + 0.5) != -1) {
-        player.grounded = true
+    let b = checkCollision(player.x, player.y + 0.2)
+    if (b != null) {
+        if (b.type == 1) {
+            player.grounded = true
+        }
     }
-    console.log(player.grounded)
     input()
-    handleCollision(checkCollision(player.x, player.y))
+    handleCollision()
     drawBlock(player.x, player.y, 2)
     loopId = requestAnimationFrame(loop)
 }
