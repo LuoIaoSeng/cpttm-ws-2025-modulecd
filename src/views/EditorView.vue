@@ -60,7 +60,7 @@ function exportMaps() {
     a.click()
 }
 
-function switchIsPlayDemo() {
+function playDemo() {
     const map = maps.value[mapIndex.value].data
     let counter = new Array(10).fill(0)
     for(let i = 0;i < NumY;i ++) {
@@ -83,12 +83,15 @@ function switchIsPlayDemo() {
     isPlayDemo.value = true
 }
 
+function backEditor() {
+    isPlayDemo.value = false
+}
+
 const isPlayDemo = ref(false)
 
 </script>
 
 <template>
-
     <div class="container">
         <div class="menu-list">
             <div>
@@ -97,8 +100,8 @@ const isPlayDemo = ref(false)
                 <button @click="mapIndex = 2">Level 3</button>
             </div>
             <div>
-                <button v-if="!isPlayDemo" @click="switchIsPlayDemo">Play&nbsp;Demo</button>
-                <button v-else @click="isPlayDemo = false">Back&nbsp;Editor</button>
+                <button v-if="!isPlayDemo" @click="playDemo">Play&nbsp;Demo</button>
+                <button v-else @click="backEditor">Back&nbsp;Editor</button>
                 <button @click="exportMaps">Export</button>
                 <button @click="toHome">
                     Home
