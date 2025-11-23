@@ -60,6 +60,29 @@ function exportMaps() {
     a.click()
 }
 
+function switchIsPlayDemo() {
+    const map = maps.value[mapIndex.value].data
+    let counter = new Array(10).fill(0)
+    for(let i = 0;i < NumY;i ++) {
+        for(let j = 0;j < NumX;j ++){
+            counter[map[i][j]] ++
+        }
+    }
+    if(counter[2] == 0) {
+        alert("Please add one spawn")
+        return
+    }
+    if(counter[2] > 1) {
+        alert("Number of spwan cannot greater than 1")
+        return
+    }
+    if(counter[3] == 0) {
+        alert("Please add stars")
+        return
+    }
+    isPlayDemo.value = true
+}
+
 const isPlayDemo = ref(false)
 
 </script>
@@ -74,7 +97,7 @@ const isPlayDemo = ref(false)
                 <button @click="mapIndex = 2">Level 3</button>
             </div>
             <div>
-                <button v-if="!isPlayDemo" @click="isPlayDemo = true">Play&nbsp;Demo</button>
+                <button v-if="!isPlayDemo" @click="switchIsPlayDemo">Play&nbsp;Demo</button>
                 <button v-else @click="isPlayDemo = false">Back&nbsp;Editor</button>
                 <button @click="exportMaps">Export</button>
                 <button @click="toHome">
