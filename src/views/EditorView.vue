@@ -4,6 +4,9 @@ import MapEditor from '@/components/MapEditor.vue';
 import MapRunner from '@/components/MapRunner.vue';
 import router from '@/router';
 import { onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const maps = ref([
     {
@@ -20,14 +23,19 @@ const maps = ref([
     },
 ])
 
-maps.value.forEach((obj) => {
-    for (let i = 0; i < NumY; i++) {
-        obj.data.push(new Array(NumX).fill(0))
-    }
-    for (let i = 0; i < NumX; i++) {
-        obj.data[NumY - 1][i] = 1
-    }
-})
+if (route.params.useLocalStorage == '1') {
+    maps.value = JSON.parse(localStorage.getItem('maps'))
+}
+else {
+    maps.value.forEach((obj) => {
+        for (let i = 0; i < NumY; i++) {
+            obj.data.push(new Array(NumX).fill(0))
+        }
+        for (let i = 0; i < NumX; i++) {
+            obj.data[NumY - 1][i] = 1
+        }
+    })
+}
 
 const mapIndex = ref(0)
 
@@ -39,6 +47,27 @@ onMounted(() => {
         e.preventDefault()
     })
 })
+
+
+function loadMap() {
+    const input = document.querySelector('#fileInput')
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0]
+        if (!file) {
+            alert('请选择一个文件')
+        }
+
+        const reader = new FileReader()
+
+        reader.onload = (e) => {
+            maps.value = JSON.parse(e.target.result)
+        }
+
+        reader.readAsText(file)
+    })
+
+    input.click()
+}
 
 function handleMouseDown(e) {
     // console.log(e)
@@ -52,6 +81,10 @@ function toHome() {
 }
 
 function exportMaps() {
+    maps.value = {
+        ...maps.value,
+        sign: 'HOHOHO'
+    }
     const data = JSON.stringify(maps.value)
     const blob = new Blob([data])
     const a = document.createElement('a')
@@ -63,20 +96,20 @@ function exportMaps() {
 function playDemo() {
     const map = maps.value[mapIndex.value].data
     let counter = new Array(10).fill(0)
-    for(let i = 0;i < NumY;i ++) {
-        for(let j = 0;j < NumX;j ++){
-            counter[map[i][j]] ++
+    for (let i = 0; i < NumY; i++) {
+        for (let j = 0; j < NumX; j++) {
+            counter[map[i][j]]++
         }
     }
-    if(counter[2] == 0) {
+    if (counter[2] == 0) {
         alert("Please add one spawn")
         return
     }
-    if(counter[2] > 1) {
+    if (counter[2] > 1) {
         alert("Number of spwan cannot greater than 1")
         return
     }
-    if(counter[3] == 0) {
+    if (counter[3] == 0) {
         alert("Please add stars")
         return
     }
@@ -102,6 +135,8 @@ const isPlayDemo = ref(false)
             <div>
                 <button v-if="!isPlayDemo" @click="playDemo">Play&nbsp;Demo</button>
                 <button v-else @click="backEditor">Back&nbsp;Editor</button>
+                <button @click="loadMap">Import</button>
+                <input type="file" id="fileInput">
                 <button @click="exportMaps">Export</button>
                 <button @click="toHome">
                     Home
@@ -159,13 +194,15 @@ const isPlayDemo = ref(false)
 .menu-list button {
     padding: 1rem;
     font-size: 1.2rem;
-    border: 3px solid #111;
+    border: 1px solid #111;
     background-color: white;
     transition: 100ms;
+    box-shadow: 5px 5px 0px 1px #111;
 }
 
 .menu-list button:hover {
-    box-shadow: 10px 10px 0px 1px #111;
+    background-color: #555;
+    color: white;
 }
 
 .editor-panel {
@@ -198,5 +235,9 @@ const isPlayDemo = ref(false)
 .tool-button>img {
     width: 100%;
     height: 100%;
+}
+
+#fileInput {
+    display: none;
 }
 </style>

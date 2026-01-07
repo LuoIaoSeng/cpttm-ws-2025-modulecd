@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import InstructionsView from '@/views/InstructionsView.vue'
 import EditorView from '@/views/EditorView.vue'
+import PreviewView from '@/views/PreviewView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,14 +11,26 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: HomeView,
-    }, {
+    },
+    {
       path: '/instructions',
       name: 'instructions',
       component: InstructionsView
-    }, {
+    },
+    {
       path: '/editor',
       name: 'editor',
       component: EditorView
+    },
+    {
+      path: '/editor/:useLocalStorage',
+      name: 'editor',
+      component: EditorView
+    },
+    {
+      path: '/preview',
+      name: 'preview',
+      component: PreviewView
     }
     // {
     //   path: '/about',

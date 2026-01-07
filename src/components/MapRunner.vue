@@ -139,7 +139,7 @@ function handleCollision() {
         }
     }
 
-    player.sy += 9.8 / 60
+    player.sy += 0.5
     player.y += player.sy / 60
 
     let yobj = checkCollision(player.px, player.y)
@@ -180,7 +180,7 @@ function input() {
         player.sx = -1
     }
     if (keySet.has('w') && player.grounded) {
-        player.sy = -10
+        player.sy = -15
         player.grounded = false
     }
     if (keySet.has('d')) {
