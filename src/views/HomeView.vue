@@ -28,8 +28,16 @@
 }
 
 .link-button {
-    border: 2px solid #333;
     padding: 1rem 4rem 1rem 2rem;
     box-sizing: border-box;
+    border: 3px solid #111;
+    background-color: white;
+    transition: 100ms;
+    font-size: 1.2rem;
+    text-decoration: none;
+    color: #111;
+}
+.link-button:hover {
+    box-shadow: 10px 10px 0px 1px #111;
 }
 </style>

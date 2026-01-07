@@ -159,6 +159,13 @@ const isPlayDemo = ref(false)
 .menu-list button {
     padding: 1rem;
     font-size: 1.2rem;
+    border: 3px solid #111;
+    background-color: white;
+    transition: 100ms;
+}
+
+.menu-list button:hover {
+    box-shadow: 10px 10px 0px 1px #111;
 }
 
 .editor-panel {
@@ -167,13 +174,17 @@ const isPlayDemo = ref(false)
 
 .tool {
     display: flex;
+    gap: 5px;
+    margin-bottom: 1rem;
 }
 
 .tool-button {
-    width: 50px;
-    height: 50px;
+    width: 70px;
+    height: 70px;
+    padding: 5px;
     outline: none;
-    border: none;
+    background-color: white;
+    border: 5px solid #111;
 }
 
 .tool-button:hover {

@@ -76,7 +76,10 @@ function initMap() {
     canvasRef.value.width = BlockSize * NumX
     canvasRef.value.height = BlockSize * NumY
 
-    drawMap()
+    // stupid sync
+    setTimeout(() => {
+        drawMap()
+    }, 100)
 }
 
 function handleMousemove(e) {

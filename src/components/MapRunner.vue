@@ -220,7 +220,9 @@ onUnmounted(() => {
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
     <div v-if="game.finished">
-        
+        <div v-if="props.demo">
+            You Finished This Level
+        </div>
     </div>
 </template>
 
