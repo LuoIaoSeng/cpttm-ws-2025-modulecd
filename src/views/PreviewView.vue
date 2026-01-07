@@ -26,10 +26,14 @@ if (maps.sign !== 'HOHOHO') {
             </div>
         </div>
         <div class="button-list">
-            <button>
+            <button @click="() => {
+                router.push('/game')
+            }">
                 Start Game
             </button>
-            <button>
+            <button @click="() => {
+                router.push('/rank')
+            }">
                 Rank
             </button>
             <button @click="() => {
@@ -52,7 +56,7 @@ if (maps.sign !== 'HOHOHO') {
 .app {
     width: 100%;
     height: 100vh;
-    padding: 1rem 0;
+    padding: 5rem 0;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;

@@ -1,11 +1,18 @@
 <script setup>
 
-import { onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
+import { getCurrentInstance, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
 import { BlockSize, NumY, NumX } from '@/assets/config';
 
 const props = defineProps([
     'map',
-    'demo'
+    'demo',
+    'pause'
+])
+
+const emit = defineEmits([
+    'next',
+    'onFinished',
+    'hpLose'
 ])
 
 const canvasRef = useTemplateRef('canvas')
@@ -21,7 +28,6 @@ const game = ref({
     stars: 0,
     time: 0,
     hp: 3,
-    pause: false,
     finished: false
 })
 
@@ -190,7 +196,7 @@ function checkCollision(x, y) {
 
 function handleCollision() {
 
-    let xobj = checkCollision(player.x, player.py)
+    let xobj = checkCollision(player.x, player.y)
 
     if (xobj != null) {
         if (xobj.type == 1) {
@@ -198,8 +204,8 @@ function handleCollision() {
         }
     }
 
-    player.sy += 0.5
-    player.y += player.sy / 60
+    player.sy += 1
+    player.y += player.sy / 120
 
     let yobj = checkCollision(player.px, player.y)
 
@@ -227,8 +233,11 @@ function handleCollision() {
         }
     }
     if (game.value.stars == 0) {
-        game.value.pause = true
         game.value.finished = true
+
+        if (!props.demo) {
+            emit('onFinished')
+        }
     }
 }
 
@@ -239,28 +248,37 @@ function input() {
         player.sx = -1
     }
     if (keySet.has('w') && player.grounded) {
-        player.sy = -15
+        player.sy = -30
         player.grounded = false
     }
     if (keySet.has('d')) {
         player.sx = 1
     }
-    player.x += player.sx * speed / 60
+    player.x += speed * player.sx / 120
 }
 
 function loop() {
-    if (!game.value.pause) {
+    if (!game.value.finished && !props.pause) {
         player.px = player.x
         player.py = player.y
         drawBlock(player.px, player.py, 0)
-        let b = checkCollision(player.x, player.y + 0.5)
+        let b = checkCollision(player.x, player.y + 0.1)
         if (b != null) {
             if (b.type == 1) {
+                player.y = player.py
                 player.grounded = true
             }
         }
         input()
         handleCollision()
+        if (Math.sqrt((player.x - player.px) ** 2 + (player.y - player.py) ** 2) > 10) {
+            player.x = player.px
+            player.y = player.py
+        }
+        if (player.sx == 0 && player.grounded) {
+            player.sy = 0
+            player.y = player.py
+        }
         drawBlock(player.x, player.y, 2)
     }
     loopId = requestAnimationFrame(loop)
@@ -280,6 +298,12 @@ onUnmounted(() => {
     <div v-if="game.finished">
         <div v-if="props.demo" class="demo-finished-tip">
             You Finished This Level
+        </div>
+        <div v-else>
+            <div v-if="getCurrentInstance().vnode.key < 2">
+                <span>You Won!</span>
+                <button @click="emit('next')">Next</button>
+            </div>
         </div>
     </div>
 </template>

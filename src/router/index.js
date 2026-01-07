@@ -3,6 +3,8 @@ import HomeView from '@/views/HomeView.vue'
 import InstructionsView from '@/views/InstructionsView.vue'
 import EditorView from '@/views/EditorView.vue'
 import PreviewView from '@/views/PreviewView.vue'
+import RankView from '@/views/RankView.vue'
+import GameView from '@/views/GameView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -31,6 +33,16 @@ const router = createRouter({
       path: '/preview',
       name: 'preview',
       component: PreviewView
+    },
+    {
+      path: '/rank',
+      name: 'rank',
+      component: RankView
+    },
+    {
+      path: '/game',
+      name: 'game',
+      component: GameView
     }
     // {
     //   path: '/about',
