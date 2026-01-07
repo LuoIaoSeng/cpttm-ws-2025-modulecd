@@ -9,7 +9,6 @@ const props = defineProps([
 ])
 
 const canvasRef = useTemplateRef('canvas')
-const blockImageRef = useTemplateRef('blockImage')
 const playerImageRef = useTemplateRef('playerImage')
 const starImageRef = useTemplateRef('starImage')
 const springImageRef = useTemplateRef('springImage')
@@ -37,6 +36,66 @@ let player = {
     grounded: true
 }
 
+function drawVariantBlock(x, y) {
+    const m = props.map
+    let [t, l, r, b] =
+        [
+            m[y - 1]?.[x] ?? 0,
+            m[y]?.[x - 1] ?? 0,
+            m[y]?.[x + 1] ?? 0,
+            m[y + 1]?.[x] ?? 0
+        ]
+    let [tl, tr, bl, br] =
+        [
+            m[y - 1]?.[x - 1] ?? 0,
+            m[y - 1]?.[x + 1] ?? 0,
+            m[y + 1]?.[x - 1] ?? 0,
+            m[y + 1]?.[x + 1] ?? 0
+        ]
+    t = t > 1 ? 0 : t
+    r = r > 1 ? 0 : r
+    b = b > 1 ? 0 : b
+    l = l > 1 ? 0 : l
+    ctx.fillStyle = '#1DF74C'
+    ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+    ctx.fillStyle = '#F7941D'
+    if (tl && t && tr && l && r && bl && b && br) {
+        ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+    } else if (!(t || r || b || l)) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize + 5, BlockSize - 10, BlockSize - 10)
+    } else if (!(t || r || b) && l) {
+        ctx.fillRect(x * BlockSize, y * BlockSize + 5, BlockSize - 5, BlockSize - 10)
+    } else if (!(t || l || b) && r) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize + 5, BlockSize - 5, BlockSize - 10)
+    } else if (!(l || r || b) && t) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize, BlockSize - 10, BlockSize - 5)
+    } else if (!(t || r || l) && b) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize + 5, BlockSize - 10, BlockSize - 5)
+    } else if (t && r && b && l) {
+        ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+    } else if (!(t || b) && l && r) {
+        ctx.fillRect(x * BlockSize, y * BlockSize + 5, BlockSize, BlockSize - 10)
+    } else if (!(l || r) && t && b) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize, BlockSize - 10, BlockSize)
+    } else if (!(t || l) && b && r) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize + 5, BlockSize - 5, BlockSize - 5)
+    } else if (!(t || r) && l && b) {
+        ctx.fillRect(x * BlockSize, y * BlockSize + 5, BlockSize - 5, BlockSize - 5)
+    } else if (!(b || l) && t && r) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize, BlockSize - 5, BlockSize - 5)
+    } else if (!(b || r) && l && t) {
+        ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize - 5, BlockSize - 5)
+    } else if (t && r && b && !l) {
+        ctx.fillRect(x * BlockSize + 5, y * BlockSize, BlockSize - 5, BlockSize)
+    } else if (t && r && !b && l) {
+        ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize - 5)
+    } else if (t && !r && b && l) {
+        ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize - 5, BlockSize)
+    } else if (!t && r && b && l) {
+        ctx.fillRect(x * BlockSize, y * BlockSize + 5, BlockSize, BlockSize - 5)
+    }
+}
+
 function drawBlock(x, y, type) {
     if (ctx === null) {
         alert('ctx is null')
@@ -47,7 +106,7 @@ function drawBlock(x, y, type) {
             ctx.fillRect(x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
         case 1:
-            ctx.drawImage(blockImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            drawVariantBlock(x, y)
             break
         case 2:
             ctx.drawImage(playerImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
@@ -215,18 +274,22 @@ onUnmounted(() => {
 
 <template>
     <canvas ref="canvas"></canvas>
-    <img ref="blockImage" src="/src/assets/Block.svg" alt="">
     <img ref="playerImage" src="/src/assets/Player.svg" alt="">
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
     <div v-if="game.finished">
-        <div v-if="props.demo">
+        <div v-if="props.demo" class="demo-finished-tip">
             You Finished This Level
         </div>
     </div>
 </template>
 
 <style scoped>
+.demo-finished-tip {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
 img {
     display: none;
 }
