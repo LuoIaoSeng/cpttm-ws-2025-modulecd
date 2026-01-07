@@ -40,16 +40,16 @@ function updateTimer() {
 }
 
 function onLevelFinished() {
-    clearInterval(k)
-    finished.value = true
-}
-
-function nextLevel() {
     records.levelRecords.push({
         level: mapIndex.value + 1,
         time: timer.value,
         hp: hp.value
     })
+    clearInterval(k)
+    finished.value = true
+}
+
+function nextLevel() {
     if (mapIndex.value < 2) {
         mapIndex.value++
         hp.value = 3
