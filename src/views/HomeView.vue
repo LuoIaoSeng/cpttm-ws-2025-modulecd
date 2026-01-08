@@ -1,7 +1,18 @@
 <script setup>
+import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
+
+const hasMap = ref(false)
+
+onMounted(() => {
+    if(localStorage.getItem('maps') === null) {
+        hasMap.value = false
+    } else {
+        hasMap.value = true
+    }
+})
 
 function loadMap() {
     const input = document.querySelector('#fileInput')
@@ -32,9 +43,7 @@ function loadMap() {
             <h1>Home Page</h1>
             <RouterLink class="link-button" to="editor/0">Map Editor</RouterLink>
             <RouterLink class="link-button" to="instructions">Instructions</RouterLink>
-            <RouterLink to="preview" v-if="() => {
-                return localStorage.getItem('maps') !== null
-            }" class="link-button">Continue</RouterLink>
+            <RouterLink to="preview" v-if="hasMap" class="link-button">Continue</RouterLink>
             <div class="link-button" @click="loadMap">Load Map File</div>
             <input type="file" id="fileInput" />
         </div>
