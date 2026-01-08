@@ -105,6 +105,9 @@ function drawBlock(x, y, type) {
 }
 
 function canPlace(x, y, type) {
+    if(y === NumY - 1) {
+        return false
+    }
     if (type != 0 && props.map[y][x] != 0) {
         return false
     }
