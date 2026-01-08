@@ -157,6 +157,12 @@ const isPlayDemo = ref(false)
                 <button class="tool-button" @click="tool = 4">
                     <img src="/src/assets/Spring.svg" alt="">
                 </button>
+                <button class="tool-button" @click="tool = 5">
+                    <img src="/src/assets/LSlope.png" alt="">
+                </button>
+                <button class="tool-button" @click="tool = 6">
+                    <img src="/src/assets/RSlope.png" alt="">
+                </button>
                 <button class="tool-button" @click="tool = 0">
                     <img src="/src/assets/Erase.svg" alt="">
                 </button>

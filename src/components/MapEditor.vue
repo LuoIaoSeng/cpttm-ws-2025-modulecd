@@ -1,6 +1,6 @@
 <script setup>
-import { onMounted, useTemplateRef, watch } from 'vue';
-import { BlockSize, NumY, NumX } from '@/assets/config';
+import { onMounted, useTemplateRef, watch } from 'vue'
+import { BlockSize, NumY, NumX } from '@/assets/config'
 
 const props = defineProps([
     'map',
@@ -101,11 +101,29 @@ function drawBlock(x, y, type) {
         case 4:
             ctx.drawImage(springImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
+        case 5:
+            ctx.fillStyle = '#1DF74C'
+            ctx.beginPath()
+            ctx.moveTo(x * BlockSize, (y + 1) * BlockSize)
+            ctx.lineTo((x + 1) * BlockSize, y * BlockSize)
+            ctx.lineTo((x + 1) * BlockSize, (y + 1) * BlockSize)
+            ctx.closePath()
+            ctx.fill()
+            break
+        case 6:
+            ctx.fillStyle = '#1DF74C'
+            ctx.beginPath()
+            ctx.moveTo((x + 1) * BlockSize, (y + 1) * BlockSize)
+            ctx.lineTo(x * BlockSize, y * BlockSize)
+            ctx.lineTo(x * BlockSize, (y + 1) * BlockSize)
+            ctx.closePath()
+            ctx.fill()
+            break
     }
 }
 
 function canPlace(x, y, type) {
-    if(y === NumY - 1) {
+    if (y === NumY - 1) {
         return false
     }
     if (type != 0 && props.map[y][x] != 0) {
@@ -118,6 +136,10 @@ function canPlace(x, y, type) {
         case 3:
         case 4:
             return true
+        case 5:
+            return props.map[y][x - 1] === 0
+        case 6:
+            return props.map[y][x + 1] === 0
     }
 }
 

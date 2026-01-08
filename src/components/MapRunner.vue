@@ -123,6 +123,24 @@ function drawBlock(x, y, type) {
         case 4:
             ctx.drawImage(springImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             break
+        case 5:
+            ctx.fillStyle = '#1DF74C'
+            ctx.beginPath()
+            ctx.moveTo(x * BlockSize, (y + 1) * BlockSize)
+            ctx.lineTo((x + 1) * BlockSize, y * BlockSize)
+            ctx.lineTo((x + 1) * BlockSize, (y + 1) * BlockSize)
+            ctx.closePath()
+            ctx.fill()
+            break
+        case 6:
+            ctx.fillStyle = '#1DF74C'
+            ctx.beginPath()
+            ctx.moveTo((x + 1) * BlockSize, (y + 1) * BlockSize)
+            ctx.lineTo(x * BlockSize, y * BlockSize)
+            ctx.lineTo(x * BlockSize, (y + 1) * BlockSize)
+            ctx.closePath()
+            ctx.fill()
+            break
     }
 }
 
@@ -195,7 +213,7 @@ function checkCollision(x, y) {
     return o
 }
 
-function handleVariantCollision(obj) {
+function handleVariantCollision(obj, xobj, yobj) {
     switch (obj.type) {
         case 1:
             player.sy = 0
@@ -212,8 +230,12 @@ function handleVariantCollision(obj) {
             break
         // spring
         case 4:
+            player.x = player.px
             player.sx = 0
             player.sy = -40
+            break
+        case 5:
+            
             break
     }
 }
@@ -242,9 +264,9 @@ function handleCollision() {
     if (xobj !== null || yobj !== null) {
 
         if (xobj != null) {
-            handleVariantCollision(xobj)
+            handleVariantCollision(xobj, xobj, yobj)
         } else if (yobj != null) {
-            handleVariantCollision(yobj)
+            handleVariantCollision(yobj, xobj, yobj)
         }
     }
 
