@@ -11,6 +11,13 @@ const displayTable = computed(() => {
     r.sort((a, b) => {
         const ra = a.levelRecords[levelIndex.value]
         const rb = b.levelRecords[levelIndex.value]
+        if(ra.time === rb.time) {
+            if(ra.hp < rb.hp) {
+                return 1
+            } else {
+                return -1
+            }
+        }
         if (ra.time > rb.time) {
             return 1
         } else {
