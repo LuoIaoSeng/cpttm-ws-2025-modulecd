@@ -1,7 +1,7 @@
 <script setup>
 
-import { getCurrentInstance, onMounted, onUnmounted, ref, useTemplateRef } from 'vue';
-import { BlockSize, NumY, NumX } from '@/assets/config';
+import { computed, getCurrentInstance, onMounted, onUnmounted, ref, useTemplateRef } from 'vue'
+import { BlockSize, NumY, NumX } from '@/assets/config'
 
 const props = defineProps([
     'map',
@@ -178,7 +178,7 @@ function isInteract(x1, y1, x2, y2) {
     return x1 < x2 + w2 &&  // Right edge of rect1 is right of left edge of rect2
         x1 + w1 > x2 &&  // Left edge of rect1 is left of right edge of rect2
         y1 < y2 + h2 &&  // Bottom edge of rect1 is below top edge of rect2
-        y1 + h1 > y2;    // Top edge of rect1 is above bottom edge of rect2
+        y1 + h1 > y2    // Top edge of rect1 is above bottom edge of rect2
 }
 
 function checkCollision(x, y) {
@@ -188,10 +188,34 @@ function checkCollision(x, y) {
             const flag = isInteract(x, y, obj.x, obj.y)
             if (flag && o == null) {
                 o = obj
+                return
             }
         }
     })
     return o
+}
+
+function handleVariantCollision(obj) {
+    switch (obj.type) {
+        case 1:
+            player.sy = 0
+            player.y = Math.ceil(player.y)
+            player.grounded = true
+            break
+        // star
+        case 3:
+            drawBlock(obj.x, obj.y, 0)
+            objects = objects.filter((o) => {
+                return !(obj.x == o.x && obj.y == o.y)
+            })
+            game.value.stars--
+            break
+        // spring
+        case 4:
+            player.sx = 0
+            player.sy = -40
+            break
+    }
 }
 
 function handleCollision() {
@@ -215,23 +239,15 @@ function handleCollision() {
         }
     }
 
-    if (xobj != null) {
-        if (xobj.type == 3) {
-            drawBlock(xobj.x, xobj.y, 0)
-            objects = objects.filter((obj) => {
-                return !(obj.x == xobj.x && obj.y == xobj.y)
-            })
-            game.value.stars--
-        }
-    } else if (yobj != null) {
-        if (yobj.type == 3) {
-            drawBlock(yobj.x, yobj.y, 0)
-            objects = objects.filter((obj) => {
-                return !(obj.x == yobj.x && obj.y == yobj.y)
-            })
-            game.value.stars--
+    if (xobj !== null || yobj !== null) {
+
+        if (xobj != null) {
+            handleVariantCollision(xobj)
+        } else if (yobj != null) {
+            handleVariantCollision(yobj)
         }
     }
+
     if (game.value.stars == 0) {
         game.value.finished = true
 
@@ -262,23 +278,16 @@ function loop() {
         player.px = player.x
         player.py = player.y
         drawBlock(player.px, player.py, 0)
-        let b = checkCollision(player.x, player.y + 0.1)
-        if (b != null) {
-            if (b.type == 1) {
-                player.y = player.py
-                player.grounded = true
-            }
-        }
         input()
         handleCollision()
-        if (Math.sqrt((player.x - player.px) ** 2 + (player.y - player.py) ** 2) > 10) {
-            player.x = player.px
-            player.y = player.py
-        }
-        if (player.sx == 0 && player.grounded) {
-            player.sy = 0
-            player.y = player.py
-        }
+        // if (Math.sqrt((player.x - player.px) ** 2 + (player.y - player.py) ** 2) > 10) {
+        //     player.x = player.px
+        //     player.y = player.py
+        // }
+        // if (player.sx == 0 && player.grounded) {
+        //     player.sy = 0
+        //     player.y = Math.ceil(player.y)
+        // }
         drawBlock(player.x, player.y, 2)
     }
     loopId = requestAnimationFrame(loop)
