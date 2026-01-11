@@ -39,6 +39,7 @@ let player = {
     py: 0,
     sx: 0,
     sy: 0,
+    dir: 1,
     grounded: true
 }
 
@@ -115,7 +116,22 @@ function drawBlock(x, y, type) {
             drawVariantBlock(x, y)
             break
         case 2:
-            ctx.drawImage(playerImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            if (player.dir === -1) {
+                ctx.save(); // Save the current canvas state
+
+                // Translate the origin to the right side of where the rect will be drawn
+                ctx.translate(player.x * BlockSize + BlockSize, player.y * BlockSize);
+
+                // Scale the x-axis by -1 (flips horizontally)
+                ctx.scale(-1, 1);
+
+                // Draw the rectangle at the original top-left corner relative to the new origin
+                ctx.drawImage(playerImageRef.value, 0, 0, BlockSize, BlockSize)
+
+                ctx.restore(); // Restore the canvas to its original state
+            } else {
+                ctx.drawImage(playerImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            }
             break
         case 3:
             ctx.drawImage(starImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
@@ -321,6 +337,11 @@ function loop() {
         //     player.sy = 0
         //     player.y = Math.ceil(player.y)
         // }
+        if (player.x > player.px) {
+            player.dir = 1
+        } else if (player.x < player.px) {
+            player.dir = -1
+        }
         drawBlock(player.x, player.y, 2)
     }
     loopId = requestAnimationFrame(loop)
