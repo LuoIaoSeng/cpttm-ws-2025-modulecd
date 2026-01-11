@@ -11,6 +11,7 @@ const canvasRef = useTemplateRef('canvas')
 const spawnImageRef = useTemplateRef('spawnImage')
 const starImageRef = useTemplateRef('starImage')
 const springImageRef = useTemplateRef('springImage')
+const platformImageRef = useTemplateRef('PlatformImage')
 
 let ctx = null
 
@@ -119,6 +120,15 @@ function drawBlock(x, y, type) {
             ctx.closePath()
             ctx.fill()
             break
+        case 7:
+        case 8:
+            ctx.drawImage(platformImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            break
+        case -2:
+            ctx.globalAlpha = 0.5
+            ctx.drawImage(platformImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            ctx.globalAlpha = 1
+            break
     }
 }
 
@@ -140,6 +150,10 @@ function canPlace(x, y, type) {
             return props.map[y][x - 1] === 0
         case 6:
             return props.map[y][x + 1] === 0
+        case 7:
+            return props.map[y][x - 1] === 0 && props.map[y][x + 1] === 0
+        case 8:
+            return props.map[y - 1][x] === 0 && props.map[y + 1][x] === 0
     }
 }
 
@@ -194,7 +208,6 @@ function handleMousemove(e) {
             }
         }
 
-
         prevX = x
         prevY = y
         prevV = props.map[y][x]
@@ -215,7 +228,17 @@ function handleMouseup(e) {
     if (dragStartX == x && dragStartY == y && props.tool != -1 && isDragging) {
         isDragging = false
         if (canPlace(x, y, props.tool)) {
-            props.map[y][x] = props.tool
+            if (props.tool === 7) {
+                props.map[y][x] = 7
+                props.map[y][x - 1] = -2
+                props.map[y][x + 1] = -2
+            } else if (props.tool === 8) {
+                props.map[y][x] = 8
+                props.map[y - 1][x] = -2
+                props.map[y + 1][x] = -2
+            } else {
+                props.map[y][x] = props.tool
+            }
         }
     } else if ((dragStartX != x || dragStartY != y) && props.tool == 1 && isDragging) {
 
@@ -264,6 +287,7 @@ onMounted(() => {
     <img ref="spawnImage" src="/src/assets/Spawn.svg" alt="">
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
+    <img ref="PlatformImage" src="/src/assets/Platform.png" alt="">
 </template>
 
 <style scoped>

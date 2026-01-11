@@ -43,11 +43,21 @@ const tool = ref(-1)
 
 onMounted(() => {
     window.addEventListener('mousedown', handleMouseDown)
+    window.addEventListener('keypress', handleKeyPress)
     window.addEventListener('contextmenu', (e) => {
         e.preventDefault()
     })
 })
 
+function handleKeyPress(e) {
+    if (e.key === 'r') {
+        if (tool.value === 7) {
+            tool.value = 8
+        } else if (tool.value === 8) {
+            tool.value = 7
+        }
+    }
+}
 
 function loadMap() {
     const input = document.querySelector('#fileInput')
@@ -163,6 +173,9 @@ const isPlayDemo = ref(false)
                 <button class="tool-button" @click="tool = 6">
                     <img src="/src/assets/RSlope.png" alt="">
                 </button>
+                <button class="tool-button" @click="tool = 7">
+                    <img src="/src/assets/Platform.png" alt="">
+                </button>
                 <button class="tool-button" @click="tool = 0">
                     <img src="/src/assets/Erase.svg" alt="">
                 </button>
@@ -170,6 +183,7 @@ const isPlayDemo = ref(false)
 
             <MapRunner v-if="isPlayDemo" :demo="true" :map="maps[mapIndex].data"></MapRunner>
             <MapEditor v-else :map="maps[mapIndex].data" :tool="tool"></MapEditor>
+            {{ tool }}
         </div>
     </div>
 

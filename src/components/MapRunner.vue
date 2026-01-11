@@ -19,6 +19,7 @@ const canvasRef = useTemplateRef('canvas')
 const playerImageRef = useTemplateRef('playerImage')
 const starImageRef = useTemplateRef('starImage')
 const springImageRef = useTemplateRef('springImage')
+const platformImageRef = useTemplateRef('PlatformImage')
 
 let ctx = null
 let loopId = null
@@ -42,6 +43,8 @@ let player = {
     dir: 1,
     grounded: true
 }
+
+let platforms = []
 
 function drawVariantBlock(x, y) {
     const m = props.map
@@ -157,6 +160,10 @@ function drawBlock(x, y, type) {
             ctx.closePath()
             ctx.fill()
             break
+        case 7:
+        case 8:
+            ctx.drawImage(platformImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
+            break
     }
 }
 
@@ -170,22 +177,36 @@ function initMap() {
 
     for (let i = 0; i < props.map.length; i++) {
         for (let j = 0; j < props.map[i].length; j++) {
-            if (props.map[i][j] == 2) {
+            const type = props.map[i][j]
+            if (type == -2) continue
+            if (type == 2) {
                 player.x = j
                 player.y = i
             } else {
-                if (props.map[i][j] == 3) {
+                if (type == 3) {
                     game.value.stars++
                 }
-                objects.push({
-                    x: j,
-                    y: i,
-                    px: j,
-                    py: i,
-                    type: props.map[i][j]
-                })
+                if (type == 7 || type == 8) {
+                    platforms.push({
+                        x: j,
+                        y: i,
+                        px: j,
+                        py: i,
+                        dir: 1,
+                        type: type
+                    })
+                } else {
+                    objects.push({
+                        x: j,
+                        y: i,
+                        px: j,
+                        py: i,
+                        dir: 1,
+                        type: type
+                    })
+                }
             }
-            drawBlock(j, i, props.map[i][j])
+            drawBlock(j, i, type)
         }
     }
 }
@@ -215,9 +236,9 @@ function isInteract(x1, y1, x2, y2) {
         y1 + h1 > y2    // Top edge of rect1 is above bottom edge of rect2
 }
 
-function checkCollision(x, y) {
+function checkCollision(x, y, arr) {
     let o = null
-    objects.forEach((obj) => {
+    arr.forEach((obj) => {
         if (obj.type != 0) {
             const flag = isInteract(x, y, obj.x, obj.y)
             if (flag && o == null) {
@@ -269,7 +290,15 @@ function handleVariantCollision(obj, xobj, yobj) {
 
 function handleCollision() {
 
-    let xobj = checkCollision(player.x, player.y)
+    let platform = checkCollision(player.x, player.y, platforms)
+    if (platform != null) {
+
+        player.x = platform.x
+        player.y = platform.y - 1
+        player.sy = 0
+    }
+
+    let xobj = checkCollision(player.x, player.y, objects)
 
     if (xobj != null) {
         if (xobj.type == 1) {
@@ -280,7 +309,7 @@ function handleCollision() {
     player.sy += 1
     player.y += player.sy / 120
 
-    let yobj = checkCollision(player.px, player.y)
+    let yobj = checkCollision(player.px, player.y, objects)
 
     if (yobj != null) {
         if (yobj.type != -1) {
@@ -324,6 +353,35 @@ function input() {
 
 function loop() {
     if (!game.value.finished && !props.pause) {
+
+        platforms.forEach((platform) => {
+            drawBlock(platform.x, platform.y, 0)
+            if (platform.type === 7) {
+                platform.x += platform.dir * 0.1
+                if (platform.x > platform.px + 1) {
+                    platform.x = platform.px + 1
+                    platform.dir = -1
+                }
+                if (platform.x < platform.px - 1) {
+                    platform.x = platform.px - 1
+                    platform.dir = 1
+                }
+                drawBlock(platform.x, platform.y, 7)
+            } else {
+
+                platform.y += platform.dir * 0.1
+                if (platform.y > platform.py + 1) {
+                    platform.y = platform.py + 1
+                    platform.dir = -1
+                }
+                if (platform.y < platform.py - 1) {
+                    platform.y = platform.py - 1
+                    platform.dir = 1
+                }
+                drawBlock(platform.x, platform.y, 8)
+            }
+        })
+
         player.px = player.x
         player.py = player.y
         drawBlock(player.px, player.py, 0)
@@ -358,6 +416,7 @@ onUnmounted(() => {
     <img ref="playerImage" src="/src/assets/Player.svg" alt="">
     <img ref="springImage" src="/src/assets/Spring.svg" alt="">
     <img ref="starImage" src="/src/assets/Star.svg" alt="">
+    <img ref="PlatformImage" src="/src/assets/Platform.png" alt="">
     <div v-if="game.finished">
         <div v-if="props.demo" class="demo-finished-tip">
             You Finished This Level
