@@ -280,7 +280,7 @@ function handleVariantCollision(obj, xobj, yobj) {
             break
         case 6:
             player.y = obj.y + -(obj.x - player.x) - 1
-            player.y = obj.x - player.x > -0.02 ? obj.y - 1 : player.y
+            player.y = obj.x - player.x > -0.01 ? obj.y - 1 : player.y
             if (player.x - player.px > 0) {
                 player.y = obj.x - player.x < -1 ? obj.y : player.y
             }
