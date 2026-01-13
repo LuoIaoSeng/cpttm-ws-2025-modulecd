@@ -1,7 +1,7 @@
 <script setup>
-import MapRunner from '@/components/MapRunner.vue';
-import { computed, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import MapRunner from '@/components/MapRunner.vue'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 
 const maps = ref(JSON.parse(localStorage.getItem('maps')))
 
@@ -14,6 +14,8 @@ const hp = ref(3)
 const pause = ref(false)
 
 const router = useRouter()
+
+const key = ref(0)
 
 let k = setInterval(updateTimer, 1)
 
@@ -56,20 +58,28 @@ function nextLevel() {
         startTime = new Date()
         k = setInterval(updateTimer, 1)
         finished.value = false
+        key.value += 1
+        pause.value = false
     }
 }
 
 function onPause() {
-    if (pause.value) {
-        k = setInterval(updateTimer, 1)
-    } else {
-        clearInterval(k)
+    if (hp.value > 0) {
+        if (pause.value) {
+            k = setInterval(updateTimer, 1)
+        } else {
+            clearInterval(k)
+        }
+        pause.value = !pause.value
     }
-    pause.value = !pause.value
 }
 
 function onHpLose() {
     hp.value -= 1
+    if (hp.value === 0) {
+        pause.value = true
+        clearInterval(k)
+    }
 }
 
 function onSubmitRecord() {
@@ -86,6 +96,15 @@ function onSubmitRecord() {
         localStorage.setItem('rank', JSON.stringify(b))
     }
     router.push('/rank')
+}
+
+function resetGame() {
+    hp.value = 3
+    startTime = new Date()
+    k = setInterval(updateTimer, 1)
+    finished.value = false
+    key.value += 1
+    pause.value = false
 }
 
 </script>
@@ -121,16 +140,26 @@ function onSubmitRecord() {
                 </div>
             </div>
             <MapRunner :map="maps[mapIndex].data" :demo="false" @onFinished="onLevelFinished" @next="nextLevel"
-                @hpLose="onHpLose" :pause="pause" :key="mapIndex" />
+                @hpLose="onHpLose" :pause="pause" :key="key" />
+            <div v-if="hp === 0">
+                <button @click="resetGame" class="submit">Retry</button>
+            </div>
             <div v-if="mapIndex == 2 && finished">
                 <input type="text" id="nickname" placeholder="Input your nickname">
-                <button @click="onSubmitRecord">Submit</button>
+                <button @click="onSubmitRecord" class="submit">Submit</button>
             </div>
         </div>
     </div>
 </template>
 
 <style scoped>
+#nickname {
+    padding: 0.5rem;
+    font-size: 1.4rem;
+    outline: 0;
+    margin-right: 1rem;
+}
+
 .container {
     display: flex;
     width: 100%;
@@ -161,7 +190,15 @@ function onSubmitRecord() {
     box-shadow: 5px 5px 0px 1px #111;
 }
 
-.clickable:hover {
+.submit {
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 1px solid #111;
+    transition: 100ms;
+    box-shadow: 5px 5px 0px 1px #111;
+}
+
+.clickable:hover, .submit:hover {
     background-color: #555;
     color: white;
 }

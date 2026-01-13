@@ -307,10 +307,7 @@ function handlePlatformCollision(platform) {
         player.dir = 1
 
         if (!props.demo) {
-            game.value.hp--
-            if (game.value.hp === 0) {
-                game.value.pause = true
-            }
+            emit('hpLose')
         }
     }
 }
@@ -463,5 +460,18 @@ onUnmounted(() => {
 
 img {
     display: none;
+}
+
+button {
+    padding: 1rem;
+    font-size: 1.2rem;
+    border: 1px solid #111;
+    transition: 100ms;
+    box-shadow: 5px 5px 0px 1px #111;
+}
+
+button:hover {
+    background-color: #555;
+    color: white;
 }
 </style>
