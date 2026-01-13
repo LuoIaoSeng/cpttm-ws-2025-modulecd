@@ -183,7 +183,6 @@ const isPlayDemo = ref(false)
 
             <MapRunner v-if="isPlayDemo" :demo="true" :map="maps[mapIndex].data"></MapRunner>
             <MapEditor v-else :map="maps[mapIndex].data" :tool="tool"></MapEditor>
-            {{ tool }}
         </div>
     </div>
 

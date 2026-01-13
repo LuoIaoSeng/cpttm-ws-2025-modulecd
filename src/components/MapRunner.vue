@@ -44,6 +44,8 @@ let player = {
     grounded: true
 }
 
+let resetPlayer = null
+
 let platforms = []
 
 function drawVariantBlock(x, y) {
@@ -120,18 +122,18 @@ function drawBlock(x, y, type) {
             break
         case 2:
             if (player.dir === -1) {
-                ctx.save(); // Save the current canvas state
+                ctx.save() // Save the current canvas state
 
                 // Translate the origin to the right side of where the rect will be drawn
-                ctx.translate(player.x * BlockSize + BlockSize, player.y * BlockSize);
+                ctx.translate(player.x * BlockSize + BlockSize, player.y * BlockSize)
 
                 // Scale the x-axis by -1 (flips horizontally)
-                ctx.scale(-1, 1);
+                ctx.scale(-1, 1)
 
                 // Draw the rectangle at the original top-left corner relative to the new origin
                 ctx.drawImage(playerImageRef.value, 0, 0, BlockSize, BlockSize)
 
-                ctx.restore(); // Restore the canvas to its original state
+                ctx.restore() // Restore the canvas to its original state
             } else {
                 ctx.drawImage(playerImageRef.value, x * BlockSize, y * BlockSize, BlockSize, BlockSize)
             }
@@ -209,6 +211,8 @@ function initMap() {
             drawBlock(j, i, type)
         }
     }
+
+    resetPlayer = structuredClone(player)
 }
 
 onMounted(() => {
@@ -288,14 +292,35 @@ function handleVariantCollision(obj, xobj, yobj) {
     }
 }
 
+function handlePlatformCollision(platform) {
+    if (player.y > platform.y + 0.5) {
+        player.sy = 0
+        player.y = platform.y + 1
+    } else if (player.y < platform.y - 1 + 0.1 && player.x > platform.x && player.x < platform.x + 1) {
+        player.y = platform.y - 1
+        player.grounded = true
+        player.sy = 0
+    } else if (player.y >= platform.y) {
+        player.x = resetPlayer.x
+        player.y = resetPlayer.y
+        player.sx = player.sy = 0
+        player.dir = 1
+
+        if (!props.demo) {
+            game.value.hp--
+            if (game.value.hp === 0) {
+                game.value.pause = true
+            }
+        }
+    }
+}
+
 function handleCollision() {
 
     let platform = checkCollision(player.x, player.y, platforms)
     if (platform != null) {
-
-        player.x = platform.x
-        player.y = platform.y - 1
-        player.sy = 0
+        handlePlatformCollision(platform)
+        return
     }
 
     let xobj = checkCollision(player.x, player.y, objects)
@@ -357,7 +382,7 @@ function loop() {
         platforms.forEach((platform) => {
             drawBlock(platform.x, platform.y, 0)
             if (platform.type === 7) {
-                platform.x += platform.dir * 0.1
+                platform.x += platform.dir * 0.05
                 if (platform.x > platform.px + 1) {
                     platform.x = platform.px + 1
                     platform.dir = -1
@@ -369,7 +394,7 @@ function loop() {
                 drawBlock(platform.x, platform.y, 7)
             } else {
 
-                platform.y += platform.dir * 0.1
+                platform.y += platform.dir * 0.05
                 if (platform.y > platform.py + 1) {
                     platform.y = platform.py + 1
                     platform.dir = -1
